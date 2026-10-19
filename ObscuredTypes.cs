@@ -104,3 +104,61 @@ public struct ObscuredBool
 
     public static implicit operator ObscuredBool(bool value) => new ObscuredBool(value);
 }
+
+public struct ObscuredString
+{
+    private char[] _encryptedChars;
+    private ushort _key;
+    private bool _isNull;
+
+    private static ushort GenerateKey() => (ushort)Random.Shared.Next(1, 65536);
+
+    public ObscuredString(string value)
+    {
+        key = GenerateKey();
+        _isNull = value == null;
+        encryptedChars = Array.Empty<char>();
+
+        if(_isNull) return;
+
+        encryptedChars = new char[value.Length];
+
+        for(int i = 0; i < value.Length; i++)
+            encryptedChars[i] = (char)(value[i] ^ key);
+    }
+
+    public string Value
+    {
+        get
+        {
+            if(_isNull) return null;
+
+            if(_encryptedChars == null || _encryptedChars.Length == 0) return string.Empty;
+
+            char[] decodedChars = new char[_encryptedChars.Length];
+
+            for(int i = 0; i < _encryptedChars.Length; i++)
+                decodedChars[i] = (char)_encryptedChars[i] ^ _key;
+
+            return new string(decodedChars);
+        }
+
+        set
+        {
+            key = GenerateKey();
+            _isNull = value == null;
+            encryptedChars = Array.Empty<char>();
+    
+            if(_isNull) return;
+    
+            encryptedChars = new char[value.Length];
+    
+            for(int i = 0; i < value.Length; i++)
+                encryptedChars[i] = (char)(value[i] ^ key);
+        }
+    }
+
+    public static implicit operator string(ObscuredString value) => value.Value;
+
+    public static implicit operator ObscuredString(string value) => new ObscuredString(value);
+}
