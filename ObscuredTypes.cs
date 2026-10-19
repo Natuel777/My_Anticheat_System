@@ -36,6 +36,28 @@ public struct ObscuredInt
     public static implicit operator ObscuredInt(int value) => new ObscuredInt(value);
 }
 
+public struct ObscuredUShort
+{
+    private ushort _encryptedValue;
+    private ushort _key;
+
+    public ObscuredInt(ushort value)
+    {
+        _key = (ushort)Random.Shared.Next(1, 65536);
+        _encryptedValue = value ^ _key; 
+    }
+
+    public ushort Value
+    {
+        get => _encryptedValue ^ _key;
+        set => _encryptedValue = value ^ _key;
+    }
+
+    public static implicit operator ushort(ObscuredUShort value) => value.Value;
+
+    public static implicit operator ObscuredUShort(ushort value) => new ObscuredUShort(value);
+}
+
 public struct ObscuredFloat
 {
     private int _encryptedBits;
