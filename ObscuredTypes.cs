@@ -184,3 +184,94 @@ public struct ObscuredString
 
     public static implicit operator ObscuredString(string value) => new ObscuredString(value);
 }
+
+using UnityEngine;
+
+public struct ObscuredVector3
+{
+    private int _encryptedX, _encryptedY, _encryptedZ;
+    private int _key;
+
+    public MyObscuredFloat(Vector3 value)
+    {
+        _key = GenerateKey();
+
+        _encryptedX = (BitConverter.SingleToInt32Bits(value.x) ^ _key)
+        _encryptedY = (BitConverter.SingleToInt32Bits(value.y) ^ _key)
+        _encryptedZ = (BitConverter.SingleToInt32Bits(value.z) ^ _key)
+    }
+
+    public float Value
+    {
+        get 
+        {
+            int bitsX = encryptedBits ^ _key;
+            float x = BitConverter.Int32BitsToSingle(bitsX);
+            int bitsY = encryptedBits ^ _key;
+            float y = BitConverter.Int32BitsToSingle(bitsY);
+            int bitsZ = encryptedBits ^ _key;
+            float z = BitConverter.Int32BitsToSingle(bitsZ);
+            return new Vector3(x, y, z);
+        }
+
+        set
+        {
+            if(_key == 0) _key = GenerateKey();
+
+            int bitsX = BitConverter.SingleToInt32Bits(value.x);
+            _encryptedX = bitsX ^ _key;
+            int bitsY = BitConverter.SingleToInt32Bits(value.y);
+            _encryptedY = bitsY ^ _key;
+            int bitsZ = BitConverter.SingleToInt32Bits(value.z);
+            _encryptedZ = bitsZ ^ _key;
+        }
+    }
+
+    public static implicit operator Vector3(ObscuredVector3 value) => value.Value;
+
+    public static implicit operator ObscuredVector3(Vector3 value) => new ObscuredVector3(value);
+
+    private static int GenerateKey() => Random.Shared.Next();
+}
+
+public struct ObscuredVector2
+{
+    private int _encryptedX, _encryptedY;
+    private int _key;
+
+    public MyObscuredFloat(Vector2 value)
+    {
+        _key = GenerateKey();
+
+        _encryptedX = (BitConverter.SingleToInt32Bits(value.x) ^ _key)
+        _encryptedY = (BitConverter.SingleToInt32Bits(value.y) ^ _key)
+    }
+
+    public float Value
+    {
+        get 
+        {
+            int bitsX = encryptedBits ^ _key;
+            float x = BitConverter.Int32BitsToSingle(bitsX);
+            int bitsY = encryptedBits ^ _key;
+            float y = BitConverter.Int32BitsToSingle(bitsY);
+            return new Vector2(x, y);
+        }
+
+        set
+        {
+            if(_key == 0) _key = GenerateKey();
+
+            int bitsX = BitConverter.SingleToInt32Bits(value.x);
+            _encryptedX = bitsX ^ _key;
+            int bitsY = BitConverter.SingleToInt32Bits(value.y);
+            _encryptedY = bitsY ^ _key;
+        }
+    }
+
+    public static implicit operator Vector2(ObscuredVector2 value) => value.Value;
+
+    public static implicit operator ObscuredVector2(Vector2 value) => new ObscuredVector2(value);
+
+    private static int GenerateKey() => Random.Shared.Next();
+}
