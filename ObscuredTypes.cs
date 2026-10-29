@@ -275,3 +275,41 @@ public struct ObscuredVector2
 
     private static int GenerateKey() => Random.Shared.Next();
 }
+
+public struct ObscuredVector2Int
+{
+    private int _encryptedX, _encryptedY;
+    private int _key;
+
+    public MyObscuredFloat(Vector2Int value)
+    {
+        _key = GenerateKey();
+
+        _encryptedX = (BitConverter.SingleToInt32Bits(value.x) ^ _key)
+        _encryptedY = (BitConverter.SingleToInt32Bits(value.y) ^ _key)
+    }
+
+    public float Value
+    {
+        get 
+        {
+            int x = encryptedBits ^ _key;
+            int y = encryptedBits ^ _key;
+            return new Vector2Int(x, y);
+        }
+
+        set
+        {
+            if(_key == 0) _key = GenerateKey();
+
+            _encryptedX = value.x ^ _key;
+            _encryptedY = value.y ^ _key;
+        }
+    }
+
+    public static implicit operator Vector2Int(ObscuredVector2 value) => value.Value;
+
+    public static implicit operator ObscuredVector2(Vector2Int value) => new ObscuredVector2(value);
+
+    private static int GenerateKey() => Random.Shared.Next();
+}
